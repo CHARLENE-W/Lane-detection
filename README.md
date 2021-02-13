@@ -213,7 +213,7 @@ cv::Point pts[4] = {
 **2.总评**
 测试程序搬运链接：[https://](https://github.com/TuSimple/tusimple-benchmark)[github.com/TuSimple/tusimple-benchmark](https://github.com/TuSimple/tusimple-benchmark)
 测试过程:在lane_demo.ipynb中把json文件改成自己的文件就好了,json_pred保存预测值，json_gt保留真实值
-```ipynb
+```py
 json_pred = [json.loads(line) for line in open('E://pred.json').readlines()]
 json_gt = [json.loads(line) for line in open('E://gt.json')]
 ```
