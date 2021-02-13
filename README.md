@@ -44,10 +44,6 @@ void myopencv::ColorToGray(cv::Mat inputImg, cv::Mat outputImg) {
 }
 ```
 
-转化效果示例如下：
-
-![image-20210212222245541](C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210212222245541.png)
-
 #### 2.中值去噪
 
 去噪原理为：g（x,y）=med{f(x-k,y-l),(k,l∈W)} ，其中W为去噪模板，在本程序中采用3*3模板，中值滤波的优点是可以很好的过滤掉椒盐噪声，在一定程度上可以过去路面上的颗粒噪声。
@@ -210,6 +206,7 @@ cv::Point pts[4] = {
 通过groundtruth.json中的数据进行检测,计算出每张图片有效的真值点（count）占总的点数(total count)的比例，最后计算100张图片的均值，结果如下：
 
 命中率在30%左右，效果并不算理想；另外可以看出命中率（acc）分布很不均匀，部分图片可达到70%~80%，部分图片命中率在10%左右
+
 **2.总评**
 测试程序搬运链接：[https://](https://github.com/TuSimple/tusimple-benchmark)[github.com/TuSimple/tusimple-benchmark](https://github.com/TuSimple/tusimple-benchmark)
 测试过程:在lane_demo.ipynb中把json文件改成自己的文件就好了,json_pred保存预测值，json_gt保留真实值
