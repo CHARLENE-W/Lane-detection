@@ -79,9 +79,6 @@ void myopencv::Median(cv::Mat inputImg, cv::Mat outputImg)
 }
 ```
 
-去噪效果如下：
-
-![image-20210212222928967](C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210212222928967.png)
 
 #### 3.二值化（OSTU法）
 
@@ -112,7 +109,6 @@ $$
 $$
  来计算,MG为全局累加均值，P为概率值。
 
-![image-20210212230305806](C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210212230305806.png)
 
 #### 4.腐蚀处理
 
@@ -142,7 +138,6 @@ for (int i = 1; i < inputImg.rows - 2; i++) {
 	}
 ```
 
-![image-20210212231228488](C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210212231228488.png)
 
 #### 5.边缘提取及ROI获取
 
@@ -182,9 +177,6 @@ cv::Point pts[4] = {
 
 在边缘提取时，由于路面并不平坦，所以存在较多的噪点，这也导致了提取的边缘中有较多无效的曲线信息
 
-![image-20210212232658578](C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210212232658578.png)
-
-
 
 #### 6.基于霍夫变换的直线检测
 
@@ -213,39 +205,23 @@ cv::Point pts[4] = {
 
 通过遍历，所有直线信息就存储在Count数组中，通过一定阈值，就可以筛选出多条直线。再从每组相似直线中筛选出经过点最多即最优的直线，就是我们需要的几条直线了。
 
-![image-20210212235533586](C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210212235533586.png)
-
-最后标注结果如下图：
-
-![image-20210212235605853](C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210212235605853.png)
-
 ## 四、程序评测
-
+**1.详细输出**
 通过groundtruth.json中的数据进行检测,计算出每张图片有效的真值点（count）占总的点数(total count)的比例，最后计算100张图片的均值，结果如下：
 
-![image-20210213021721784](C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210213021721784.png)
-
 命中率在30%左右，效果并不算理想；另外可以看出命中率（acc）分布很不均匀，部分图片可达到70%~80%，部分图片命中率在10%左右
-
-<img src="C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210213021847451.png" alt="image-20210213021847451" style="zoom: 67%;" />
-
-同时也存在效果很差的例子：
-
-<img src="C:\Users\万ql\AppData\Roaming\Typora\typora-user-images\image-20210213022120789.png" alt="image-20210213022120789" style="zoom:80%;" />
-
-## 五、结果分析
-
-分析结果，主要的检测问题出现在边缘处理部分以及ROI获得部分。在边缘处理时，路面的凹凸情况造成了较大影响，导致在后续霍夫直线检测时出现较多杂乱直线，影响标注结果,白色车道线在这个个过程中损失也很大，后续结果中黄色实线车道线检测结果较好，白色虚线车道线受环境、角度等因素影响检测效果波动较大。同时ROI仅根据图像尺寸进行简单划分，这也是存在较多问题的，直到与弯道的车道线范围并不一致，简单的根据直行道路的视角进行划分就会导致将很多有效信息意外舍去，或者留下很多无效信息，影响判断。
-
-另外，对于曲线的检测也是很大的不足，在该程序中仅采用了直线拟合方式，并未检测曲线，所以在遇到较大弯道的车道时，误差很大。
-
-对于边缘检测出现的问题，可能的改进方式有通过色彩提取，或者进一步平滑噪声的方式改进；对于曲线的检测，应该在检测出直线后，根据直线走向判断行进方向，如果是弯道，则应该进一步检测曲线；对于ROI范围的动态选取，目前尚未有思路，希望之后通过查询相关资料能够有所想法。
-
-此外，该程序相关算法都比较暴力简单，所以导致了运行效率较低，这也是未来的改进方向之一。
-
-希望未来能在本次实验的基础上，进一步巩固相关图像处理知识，并且能够通过其他方式优化当前的弊端，
-
-  ## 六、附录
+**2.总评**
+测试程序搬运链接：[https://](https://github.com/TuSimple/tusimple-benchmark)[github.com/TuSimple/tusimple-benchmark](https://github.com/TuSimple/tusimple-benchmark)
+测试过程:在lane_demo.ipynb中把json文件改成自己的文件就好了,json_pred保存预测值，json_gt保留真实值
+```ipynb
+json_pred = [json.loads(line) for line in open('E://pred.json').readlines()]
+json_gt = [json.loads(line) for line in open('E://gt.json')]
+```
+**注意**：
+1. 计算过程中，会以gt中的数据为索引，在pred中定位，所以要注意数据范围的一致性（一个偷懒的方式：在输出pred.json时，重新输出一个真值文件，数据与预测值数据对应）
+2. LaneEval.bench(pred_lanes, gt_lanes, y_samples, run_time)中最后有一个runtime参数，根据评测程序中的readme文件可知，该参数不影响具体计算，只是有个判定（跑的太慢了，准确率视作0...）,所以可以直接在评测程序中将该参数写为常值
+	
+  ## 五、附录
 
 基本操作接口如下,详细定义在源码文件夹中。
 
